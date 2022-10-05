@@ -1,0 +1,177 @@
+#(a) textstrip
+
+def textstrip(filename):
+    import regex as re
+    s=open(filename,'r',encoding='utf8') #Using 'r' to read and for endcoding utf8 to get rid of UnicodeDecodeError
+    s=s.read().replace('\n','') #Replacing new line character with space
+    s=s.lower() #Making all characters of the string as lowercase
+    s=re.sub('[^a-z]+','',s) #Removing all special symbols,spaces,etc from the string except 26 lowercase alphabets
+    
+    return s
+ 
+ #(b) letter_distribution
+
+def letter_distribution(s):
+    freq={} #First creating an empty dictionary named 'freq'
+    for i in s:
+        if i in freq:  #For each alphabet in string 's', making a key by the name of that alphabet and incrementing the value
+            freq[i]+=1 # associated to the key with the number of times it appears in the string.
+        else:
+            freq[i]=1
+    return freq
+    
+
+#(c) Substitution_encryption
+
+def substitution_encrypt(s,d):
+    list1=list(d.keys()) #Making a list of keys of dictionary 'd'
+    list2=list(d.values()) #Making a list of values of dictionary 'd'
+    encrypted_list=""  #Creating an empty string named 'encrypted_list'
+    for i in s:
+        encrypted_list+=d[i] #Substituting alphabets in string with the values corresponding to their names as keys in the
+                             #dictionary
+    return encrypted_list    
+    
+  
+  #(e) Cryptanalysis
+
+def cryptanalyse_substitution(s):
+    f=(letter_distribution(s)) #Using letter_distribution function to return a dictionary named 'f' with alphabets and
+                               #their frequencies in string 's'
+    l1=list(f.keys())      #Making a list of keys of dictionary 'f'    
+    l2=list(f.values())    #Making a list of values of dictionary 'f'
+    list_number1=l2.copy() #Making a copy of list of values in another list with name 'list_number1'
+    sorted_list=quicksort(list_number1) #Sorting 'list_number1' by using quicksort algorithm
+    final_list=sorted_list.reverse() #Reversing the order of list from ascending to descending using reverse function
+    l=[] #Creating an empty list 'l'
+    for j in final_list:
+        l.append(l1[l2.index(j)]) #Appending list 'l' with alphabets in descending order as per their frequencies in the string
+    
+    
+    Freq_table = ['e', 't', 'a', 'o', 'i', 'n', 's', 'h', 'r', 'd', 'l', 'c', 'u', 'm', 'w', 'f', 
+                         'g', 'y', 'p', 'b', 'v', 'k', 'j', 'x', 'q', 'z']# This list is obtained on the basis of frequency 
+                                                                          #table given in chapter 1 for frequency analysis
+    
+    d={l[i]: Freq_table[i] for i in range(len(l))} #Creating a dictionary 'd' using dictionary comprehension on two lists
+    
+    return d       
+    
+  
+  #(f) Vigenere_encryption
+
+def vigenere_encrypt(s,password):
+    s1=string.ascii_lowercase #Creating a string 's1' of lowercase alphabets
+    t=[] #Creating an empty list 't' for storing the indices of password's alphabets
+    y=len(password)
+    for p in password:
+        t.append(s1.index(p)) # Appending list 't' with the indices of alphabets of password with respect to string 's1'
+    q=""     #Creating an empty string 'q'
+    for i in range(len(s)):
+        k=s1.index(s[i]) #To get the indices of alphabets in our string with respect to string 's1'
+        j=i%y # Variable 'j' stores the remainder when i divided by y where y is the length of password
+        u=k+t[j] # Updating the index 
+        if u>=26:
+            u=u%26 #Taking remainder in case the updated index 'u' crosses the range of 26 alphabets
+        q+=s1[u]  #Appending string 'q' with alphabet in string s1 at uth index
+        #print(u)
+        #print(s1[u]) 
+    return q    
+    
+    
+    #(g) Vigenere_decryption
+
+def vigenere_decrypt(s,password):
+    s1=string.ascii_lowercase #Creating a string 's1' of lowercase alphabets
+    t=[] #Creating an empty list 't' for storing the indices of password's alphabets
+    y=len(password)
+    for p in password:
+        t.append(s1.index(p)) #Appending list 't' with the indices of alphabets of password with respect to string 's1'
+    q=""     #Creating an empty string 'q'
+    for i in range(len(s)):
+        k=s1.index(s[i])  #To get the indices of alphabets in our string with respect to string 's1'
+        j=i%y # Variable 'j' stores the remainder when i divided by y where y is the length of password
+        u=k-t[j] #Updating the index 
+        q+=s1[u] #Appending string 'q' with alphabet in string s1 at uth position
+    
+    return q
+
+
+#(h) Rotate_compare
+
+def rotate_compare(s,r): #r is the number of places by which we have to rotate the string
+    
+    s1=string.ascii_lowercase #Creating a string 's1' of lowercase alphabets
+    y=len(s) 
+    rotated="" #Creating an empty string 'rotated' which will store the alphabets of string 's' after rotation
+    for i in range(len(s)):
+        rotated+=s[i-r] #Appending the string 'rotated' with alphabets from 's' string accordingly
+        #print(rotated)
+        
+        
+    collisions=0 #Declaring a variable 'collisions' which will store the number of collisions in both strings where one string
+                 #is the original one and other one that we obtain after rotation
+    for i in range(len(s)):
+        if s[i]==rotated[i]:
+            collisions+=1 #Updating the value of collisions
+    
+    return collisions
+            
+        
+ #(i) Cryptanalysis_Vigenere
+
+def cryptanalyse_vigenere_afterlength(s,k):
+    s1=string.ascii_lowercase #Creating a string 's1' of lowercase alphabets
+    l=[] #Creating an empty list 'l' which will contain other empty lists as elements
+    for i in range(k):
+        l1=[]
+        l.append(l1) #Appending list 'l' with other k empty lists k is the length of password
+    for i in range(len(s)):
+        p=i%k  #To get the value of p within the range of length of the password only
+        l[p].append(s[i]) #Appending lists in 'l' list with alphabets corresponding to alphabets in key used for encryption
+                          #e.g. it will append first empty list with all the alphabets of string 's' which are encrypted by 
+                          #alphabet at index 0 of the password and so on.
+                
+    password=""  #Creating an empty string 'password'
+    for j in range(k):
+        maximum=0
+        max_element="" #Creating an empty string 'max_element'
+        ind_pass=0
+        for element in l[j]: 
+            m=l[j].count(element) #Using count function to count number of occurences of element in l[j](list at jth index) 
+                                  #in list l and storing that count under variable 'm'
+            if m>maximum:
+                maximum=m
+                max_element=element
+        ind_pass=s1.index(max_element)-s1.index('e') #Since 'e' is the most frequently occuring alphabet in english language so
+                                                     #it implies that all e's have become most occuring alphabet in l[j](list at  
+                                                     #jth index) and the difference between the index of most occuring alphabet  
+                                                     #of l[j] and the index of 'e' with respect to string's1's gives us the 
+                                                     #number of shifts and that number of shifts is equal to the index of password's 
+                                                     #alphabet in string s1
+        password+=s1[ind_pass] #Appending string 'password' with alphabets 
+        
+    return password   
+    
+    
+    #(j) cryptanalyse_vigenere_findlength
+
+def cryptanalyse_vigenere_findlength(s):
+    import numpy as np
+    n_of_collisions=[] #Creating an empty list 'n_of_collisions'
+    for i in range(1,len(s)-1):
+        n_of_collisions.append(rotate_compare(s,i)) #Using rotate_compare function defined earlier to get the number of collisions
+    #print(n_of_collisions[0:10]) 
+    return np.argmax(n_of_collisions[0:10])+1 #Using argmax function of numpy library to get the maximum value
+                                              #Just checking only first 10 elements of list 'n_of_collisions' to get the 
+                                              #maximum value out of them and adding +1 to it to return the length of password
+                                
+                                
+    #(k) cryptanalyse_vigenere
+
+def cryptanalyse_vigenere(s):
+    a=cryptanalyse_vigenere_findlength(s) #This function returns the length of password.
+    b=cryptanalyse_vigenere_afterlength(s,a)#This function returns the password of encryption.
+    c=vigenere_decrypt(s,b) #This function returns the plaintext.
+    
+    return b,c
+    
